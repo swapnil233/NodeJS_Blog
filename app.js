@@ -16,7 +16,6 @@ const dbURI = process.env.URI;
 app.set('view engine', 'ejs')
 
 // MongoDB Connection
-// const dbURI = "mongodb+srv://tester:test1234@nodeblog.67anc.mongodb.net/node-blog?retryWrites=true&w=majority"
 mongoose.connect(dbURI)
     .then((result) => {
         console.log("Connected to DB")
