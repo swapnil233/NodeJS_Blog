@@ -1,19 +1,22 @@
-const express = require("express");
+const express = require("express")
 const mongoose = require("mongoose")
 const morgan = require("morgan")
 const Blog = require("./models/blog")
-
-const dotenv = require("dotenv");
-require('dotenv').config()
+const dotenv = require("dotenv")
 
 // Express App
-const app = express();
+const app = express()
 
 // Environment Variables
-const dbURI = process.env.URI;
+require('dotenv').config()
+const dbURI = process.env.URI
 
 // View Engine
 app.set('view engine', 'ejs')
+
+// Middleware & static files
+app.use(express.static('public'))
+app.use(morgan('dev'))
 
 // MongoDB Connection
 mongoose.connect(dbURI)
@@ -27,10 +30,6 @@ mongoose.connect(dbURI)
         console.log(err)
     })
 
-// Middleware & static files
-app.use(express.static('public'))
-app.use(morgan('dev'));
-
 // // MongoDB Route to save a blog
 // app.get("/add-blog", (req, res) => {
 //     // Instance of Blog
@@ -38,16 +37,16 @@ app.use(morgan('dev'));
 //         title: "New Blog 2",
 //         snippet: "About my new blog",
 //         body: "More about my new blog"
-//     });
+//     })
 
 //     // Save the new instance of the Blog model
 //     blog.save()
 //         .then(result => {
-//             res.send(result);
+//             res.send(result)
 //         })
 //         .catch(err => {
 //             console.log(err)
-//         });
+//         })
 // })
 
 // // MongoDB Route to Get all blogs
@@ -70,7 +69,7 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
     res.render("about", {
         title: "About"
-    });
+    })
 })
 
 // Blog Routes
@@ -83,7 +82,7 @@ app.get("/blogs", (req, res) => {
             res.render("index", {
                 title: "All Blogs",
                 blogs: result
-            });
+            })
         })
         .catch(err => {
             console.log(err)
