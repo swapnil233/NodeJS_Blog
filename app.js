@@ -1,7 +1,9 @@
 const express = require("express")
+
 const mongoose = require("mongoose")
-const morgan = require("morgan")
 const Blog = require("./models/blog")
+
+const morgan = require("morgan")
 const dotenv = require("dotenv")
 
 // Express App
@@ -10,21 +12,27 @@ const app = express()
 // Environment Variables
 require('dotenv').config()
 const dbURI = process.env.URI
+const PORT = process.env.PORT || 3000;
 
 // View Engine
 app.set('view engine', 'ejs')
+app.set("views", "views");
 
 // Middleware & static files
 app.use(express.static('public'))
 app.use(morgan('dev'))
+app.use(express.urlencoded({
+    extended: true
+}))
 
 // MongoDB Connection
 mongoose.connect(dbURI)
-    .then((result) => {
+    .then(() => {
         console.log("Connected to DB")
 
         // Listen for requests only when connected to DB
-        app.listen(3000)
+        app.listen(PORT)
+        console.log(`Listening on port ${PORT}`)
     })
     .catch((err) => {
         console.log(err)
@@ -89,10 +97,48 @@ app.get("/blogs", (req, res) => {
         })
 })
 
+app.post('/blogs', (req, res) => {
+    const blog = new Blog(req.body);
+
+    blog.save()
+        .then((result) => {
+            res.redirect("/blogs");
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+})
+
 app.get('/blogs/create', (req, res) => {
     res.render('create', {
         title: "Create"
     })
+})
+
+app.get("/blogs/:id", (req, res) => {
+    const id = req.params.id;
+    Blog.findById(id)
+        .then(results => {
+            res.render("details", {
+                blog: results,
+                title: results.title
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+})
+
+app.delete("/blogs/:id", (req, res) => {
+    const id = req.params.id;
+
+    Blog.findByIdAndDelete(id)
+        .then(() => {
+            res.json({
+                redirect: "/"
+            })
+        })
+        .catch(err => console.log(err))
 })
 
 // 404 -- needs to be last
